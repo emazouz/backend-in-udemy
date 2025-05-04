@@ -1,6 +1,6 @@
 import userModel from "../models/userSchema";
 import bcrypt from "bcrypt";
-
+import jwt from "jsonwebtoken";
 interface IRegisterParams {
   firstName: string;
   lastName: string;
@@ -27,7 +27,7 @@ export const register = async ({
   });
   await newUser.save();
 
-  return { data: newUser, statusCode: 200 };
+  return { data: generatJwt({ firstName, lastName, email }), statusCode: 200 };
 };
 
 interface ILoginParams {
@@ -44,5 +44,19 @@ export const login = async ({ email, password }: ILoginParams) => {
   if (!passwordMatch) {
     return { data: "Incorrect password try again!", statusCode: 400 };
   }
-  return { data: findUser, statusCode: 200 };
+  return {
+    data: generatJwt({
+      email,
+      firstName: findUser.firstName,
+      lastName: findUser.lastName,
+    }),
+    statusCode: 200,
+  };
+};
+
+const generatJwt = (data: any) => {
+  return jwt.sign(
+    data,
+    "c2hjhDS7yDBYeYM4j45wMg7hcY5vovlpFVkrkG9xlLExgf8WUsYbLuTdei760LP1"
+  );
 };
