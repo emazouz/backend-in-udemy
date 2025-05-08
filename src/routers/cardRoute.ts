@@ -1,15 +1,40 @@
 import express, { Request } from "express";
-import { getActiveCardForUser } from "../services/cardService";
+import {
+  addItemToCard,
+  getActiveCardForUser,
+  updateItemToCard,
+} from "../services/cardService";
 import validatJWT from "../middleware/validatJWT";
+import { ExtendRequest } from "../types/extendRequest";
 
 const router = express.Router();
-interface ExtendRequest extends Request {
-  user?: any;
-}
+
 router.get("/", validatJWT, async (req: ExtendRequest, res) => {
   const userId = req.user._id;
   const card = await getActiveCardForUser({ userId });
   res.status(200).send(card);
+});
+
+router.post("/items", validatJWT, async (req: ExtendRequest, res) => {
+  const userId = req.user._id;
+  const { productId, quantity } = req.body;
+  const response = await addItemToCard({
+    userId,
+    productId,
+    quantity,
+  });
+  res.status(response.statusCode).send(response.data);
+});
+
+router.put("/items", validatJWT, async (req: ExtendRequest, res) => {
+  const userId = req.user?._id;
+  const { productId, quantity } = req.body;
+  const response = await updateItemToCard({
+    userId,
+    productId,
+    quantity,
+  });
+  res.status(response.statusCode).send(response.data);
 });
 
 export default router;
