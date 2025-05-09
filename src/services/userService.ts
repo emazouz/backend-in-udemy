@@ -55,8 +55,5 @@ export const login = async ({ email, password }: ILoginParams) => {
 };
 
 const generatJwt = (data: any) => {
-  return jwt.sign(
-    data,
-    "c2hjhDS7yDBYeYM4j45wMg7hcY5vovlpFVkrkG9xlLExgf8WUsYbLuTdei760LP1"
-  );
+  return jwt.sign(data, process.env.JWT_SECRET || "");
 };
