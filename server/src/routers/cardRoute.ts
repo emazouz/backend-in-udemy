@@ -8,7 +8,7 @@ import {
   checkOut,
 } from "../services/cardService";
 import validatJWT from "../middleware/validatJWT";
-import { ExtendRequest } from "../types/extendRequest";
+import { ExtendRequest } from "../interfaces/extendRequest";
 
 const router = express.Router();
 
@@ -69,8 +69,3 @@ router.post("/checkout", validatJWT, async (req: ExtendRequest, res) => {
 });
 
 export default router;
-
-/**
- * token user
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaXJzdE5hbWUiOiJ5b3VlbnMiLCJsYXN0TmFtZSI6Im1hem91eiIsImVtYWlsIjoibWF6b3V6QGVtYXpvdXouY29tIiwiaWF0IjoxNzQ2NzI0MzI4fQ.FsEYpanMjGU9sKp2vMA1imabTH_jH-VEjNyDYwyaUHk
- */
