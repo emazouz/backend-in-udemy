@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document, ObjectId } from "mongoose";
 import { IProduct } from "./productModel";
 
-let statusSchema = ["Active", "Complated"];
+let statusSchema = ["Active", "Completed"];
 
 interface Items {
   product: IProduct;
@@ -19,13 +19,13 @@ interface ICard extends Document {
   userId: ObjectId | string;
   itemsCard: Items[];
   totalAmount: number;
-  status: "Active" | "Complated";
+  status: "Active" | "Completed";
 }
 const cardSchema = new Schema<ICard>({
   userId: { type: Schema.Types.ObjectId, required: true },
   itemsCard: [],
   totalAmount: { type: Number, required: true },
-  status: { type: String, enum: statusSchema},
+  status: { type: String, enum: statusSchema },
 });
 
 const cardModil = mongoose.model<ICard>("Card", cardSchema);
