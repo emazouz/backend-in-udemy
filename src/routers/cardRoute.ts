@@ -4,6 +4,7 @@ import {
   getActiveCardForUser,
   updateItemToCard,
   deleteItemToCard,
+  clearCard,
 } from "../services/cardService";
 import validatJWT from "../middleware/validatJWT";
 import { ExtendRequest } from "../types/extendRequest";
@@ -38,7 +39,7 @@ router.put("/items", validatJWT, async (req: ExtendRequest, res) => {
   res.status(response.statusCode).send(response.data);
 });
 
-// ! delete items to cart
+// ! delete item to cart
 
 router.delete('/items/:productId', validatJWT, async (req: ExtendRequest, res) => {
   const userId = req?.user?._id;
@@ -47,6 +48,13 @@ router.delete('/items/:productId', validatJWT, async (req: ExtendRequest, res) =
   res.status(response.statusCode).send(response.data);
 })
 
+// ! clear cart
+
+router.delete('/', validatJWT, async (req: ExtendRequest, res) => {
+  const userId = req.user._id;
+  const response = await clearCard({ userId });
+  res.status(response.statusCode).send(response.data);
+})
 
 export default router;
 
