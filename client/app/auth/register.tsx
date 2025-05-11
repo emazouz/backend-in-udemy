@@ -1,6 +1,8 @@
+import InputFailed from "components/ui/InputFailed";
 import { BASE_URL } from "constant/BasicUrl";
+import { useAuthContext } from "context/auth/AuthContext";
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -11,32 +13,36 @@ export default function Register() {
   });
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const { login } = useAuthContext();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     if (formData.password !== confirmPassword) {
       setError("Passwords do not match. Please correct the error.");
       return;
     }
-
-    fetch(`${BASE_URL}/user/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to register. Please try again.");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log("Registration successful:", data);
-      })
-      .catch((error) => {
-        console.error("Error submitting registration form:", error.message);
-        setError("Registration failed. Please try again later.");
+    try {
+      const response = await fetch(`${BASE_URL}/user/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
+      if (!response.ok) {
+        throw new Error("Failed to register. Please try again.");
+      }
+      const token = await response.json();
+      if (!token) {
+        throw new Error("Incorrect token. Please try again.");
+      }
+
+      login(formData.email, token);
+      navigate("/login");
+    } catch (error) {
+      console.error("Error submitting registration form:", error);
+      setError("Registration failed. Please try again later.");
+    }
   };
 
   return (
@@ -116,36 +122,3 @@ export default function Register() {
     </div>
   );
 }
-
-interface IInputFailed {
-  title: string;
-  label: string;
-  type: string;
-  value: any;
-  action: any;
-}
-
-const InputFailed = ({ title, label, type, value, action }: IInputFailed) => {
-  return (
-    <div className="mb-3">
-      <label
-        className="block text-gray-800 text-sm font-semibold mb-1"
-        htmlFor={label}
-      >
-        {title}
-      </label>
-      <input
-        className="shadow-md appearance-none border border-gray-300 rounded-lg w-full py-2 px-4 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-        id={label}
-        type={type}
-        placeholder={`Enter your ${label}`}
-        value={value}
-        onChange={action}
-        required
-      />
-      <p className="text-sm text-red-500 mt-1 hidden" id={`${label}-error`}>
-        This field is required.
-      </p>
-    </div>
-  );
-};

@@ -8,9 +8,10 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
-import "./styles/app.css";
+import "styles/app.css";
 import Navbar from "components/main/Navbar";
 import Footer from "components/main/Footer";
+import { AuthProvider } from "context/auth/AuthProvider";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -35,7 +36,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <AuthProvider>{children}</AuthProvider>
         <ScrollRestoration />
         <Scripts />
       </body>
