@@ -7,13 +7,13 @@ import {
   IGetActiveCardForUser,
   IUpdateItemToCard,
 } from "../interfaces/interfaceCard";
-import cardModil from "../models/cardModel";
+import cardModel from "../models/cardModel";
 import orderModel, { IOrderItem } from "../models/orderModel";
 import productModel from "../models/productModel";
 
 const createCardForUser = async ({ userId }: ICreateCardForUser) => {
   try {
-    const newCard = await cardModil.create({ userId, totalAmount: 0 });
+    const newCard = await cardModel.create({ userId, totalAmount: 0 });
     return newCard; // No need to call save() after create()
   } catch (err) {
     console.error("Error creating card:", err);
@@ -25,7 +25,7 @@ export const getActiveCardForUser = async ({
   userId,
 }: IGetActiveCardForUser) => {
   try {
-    let card = await cardModil.findOne({ userId });
+    let card = await cardModel.findOne({ userId });
 
     if (!card) {
       card = await createCardForUser({ userId });
@@ -50,7 +50,6 @@ export const addItemToCard = async ({
     if (!card) {
       return { data: "Active cart not found for the user", statusCode: 404 };
     }
-
     // Check if the product already exists in the cart
     const existsInCard = card.itemsCard.find(
       (e) => e.product.toString() === productId
@@ -181,6 +180,7 @@ export const deleteItemToCard = async ({
         statusCode: 400,
       };
     }
+  
 
     const anotherItem = card.itemsCard.filter(
       (e) => e.product.toString() !== productId

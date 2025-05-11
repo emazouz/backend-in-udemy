@@ -28,6 +28,6 @@ const cardSchema = new Schema<ICard>({
   status: { type: String, enum: statusSchema },
 });
 
-const cardModil = mongoose.model<ICard>("Card", cardSchema);
+const cardModel = mongoose.model<ICard>("Card", cardSchema);
 
-export default cardModil;
+export default cardModel;
