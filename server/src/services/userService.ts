@@ -32,10 +32,12 @@ export const login = async ({ email, password }: ILoginParams) => {
     if (!findUser) {
       return { data: "Incorrect email or password!", statusCode: 400 };
     }
-    const passwordMatch = bcrypt.compare(password, findUser.password);
+
+    const passwordMatch = await bcrypt.compare(password, findUser.password); // أضف await هنا
     if (!passwordMatch) {
-      return { data: "Incorrect password try again!", statusCode: 400 };
+      return { data: "Incorrect password. Please try again!", statusCode: 400 };
     }
+
     return {
       data: generatJwt({
         email,

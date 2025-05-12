@@ -11,8 +11,8 @@ export default function Login() {
     password: "",
   });
   const navigate = useNavigate();
-
   const { login } = useAuthContext();
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
@@ -21,19 +21,24 @@ export default function Login() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+
       if (!response.ok) {
-        setError("Failed to login. Please try again.");
+        const errorMessage = await response.json();
+        setError(errorMessage.message || "Failed to login. Please try again.");
         return;
       }
+
       const token = await response.json();
+
       if (!token) {
         setError("Incorrect token. Please try again.");
         return;
       }
+
       login(formData.email, token);
       navigate("/");
     } catch (error) {
-      console.error("Incorrect email or password!:", error);
+      console.error("Login error:", error);
       setError("Login failed. Please try again later.");
     }
   };
@@ -50,7 +55,7 @@ export default function Login() {
             label="email"
             type="email"
             value={formData.email}
-            action={(e: any) =>
+            action={(e: React.ChangeEvent<HTMLInputElement>) =>
               setFormData({ ...formData, email: e.target.value })
             }
           />
@@ -59,7 +64,7 @@ export default function Login() {
             label="password"
             type="password"
             value={formData.password}
-            action={(e: any) =>
+            action={(e: React.ChangeEvent<HTMLInputElement>) =>
               setFormData({ ...formData, password: e.target.value })
             }
           />
@@ -70,7 +75,7 @@ export default function Login() {
             Login
           </button>
         </form>
-        <p className="block text-center text-red-500">{error && error}</p>
+        {error && <p className="block text-center text-red-500">{error}</p>}
         <div className="flex items-center mt-4 text-center">
           <p className="text-gray-600">Don't have an account? </p>
           <Link to="/register" className="text-blue-600 hover:underline">
