@@ -6,7 +6,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   return (
@@ -85,6 +85,13 @@ export default function Navbar() {
                 </li>
               </ul>
             </nav>
+
+            <Link
+              to={"/cart"}
+              className="font-bold text-white cursor-pointer duration-200 hover:text-[#00f]"
+            >
+              Cart
+            </Link>
 
             {isLogin ? (
               <div className="relative hidden md:block group">

@@ -7,9 +7,12 @@ import {
 
 export default [
   index("routes/main.tsx"),
-  route("demo", "demo/page.tsx"),
   layout("auth/layout.tsx", [
     route("/login", "auth/login.tsx"),
     route("/register", "auth/register.tsx"),
+  ]),
+  layout("cart/layout.tsx", [
+    route("/cart", "cart/productCart.tsx"),
+    route("/orders", "cart/itemsOrder.tsx"),
   ]),
 ] satisfies RouteConfig;

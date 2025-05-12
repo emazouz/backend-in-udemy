@@ -8,25 +8,25 @@ export const seedInitialProducts = async () => {
   try {
     const products = [
       {
-        title: "LapTop Lenovo",
+        title: "Laptop Pro",
+        price: 999.99,
+        stock: 22,
         image:
-          "https://imgs.search.brave.com/4J-SaQsnUss3pCYwCbCBf9J_RByxudwr3rPbusJ5EaY/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvNDYy/NDYzNjMyL3Bob3Rv/L2EtbGVub3ZvLWlk/ZWFwYWQteTUxMHAt/Z2FtaW5nLWxhcHRv/cC10YWtlbi1vbi1t/YXktMTYtMjAxNC5q/cGc_cz02MTJ4NjEy/Jnc9MCZrPTIwJmM9/YnVSNGRxRkJDekQt/NTh0RXA4S2U0V0lw/MEJDVmtNdkxaT3R2/bmNIU2dPVT0",
-        price: 3000,
-        stock: 200,
+          "https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=300",
       },
       {
-        title: "LapTop Lenovo",
-        image:
-          "https://imgs.search.brave.com/4J-SaQsnUss3pCYwCbCBf9J_RByxudwr3rPbusJ5EaY/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvNDYy/NDYzNjMyL3Bob3Rv/L2EtbGVub3ZvLWlk/ZWFwYWQteTUxMHAt/Z2FtaW5nLWxhcHRv/cC10YWtlbi1vbi1t/YXktMTYtMjAxNC5q/cGc_cz02MTJ4NjEy/Jnc9MCZrPTIwJmM9/YnVSNGRxRkJDekQt/NTh0RXA4S2U0V0lw/MEJDVmtNdkxaT3R2/bmNIU2dPVT0",
-        price: 6000,
-        stock: 20,
-      },
-      {
-        title: "LapTop Lenovo",
-        image:
-          "https://imgs.search.brave.com/4J-SaQsnUss3pCYwCbCBf9J_RByxudwr3rPbusJ5EaY/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvNDYy/NDYzNjMyL3Bob3Rv/L2EtbGVub3ZvLWlk/ZWFwYWQteTUxMHAt/Z2FtaW5nLWxhcHRv/cC10YWtlbi1vbi1t/YXktMTYtMjAxNC5q/cGc_cz02MTJ4NjEy/Jnc9MCZrPTIwJmM9/YnVSNGRxRkJDekQt/NTh0RXA4S2U0V0lw/MEJDVmtNdkxaT3R2/bmNIU2dPVT0",
-        price: 5000,
+        title: "Wireless Headphones",
+        price: 199.99,
         stock: 10,
+        image:
+          "https://images.pexels.com/photos/3587478/pexels-photo-3587478.jpeg?auto=compress&cs=tinysrgb&w=300",
+      },
+      {
+        title: "Smartwatch",
+        price: 299.99,
+        stock: 20,
+        image:
+          "https://images.pexels.com/photos/437037/pexels-photo-437037.jpeg?auto=compress&cs=tinysrgb&w=300",
       },
     ];
 
