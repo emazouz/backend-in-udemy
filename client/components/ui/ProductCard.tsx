@@ -1,6 +1,9 @@
+import { useCart } from "context/cart/CartContext";
 import type { IProduct } from "interfaces/productInterface";
 
 export default function ProductCard({ _id, title, image, price }: IProduct) {
+  const { addItemToCart } = useCart();
+
   return (
     <div className="block rounded-lg p-4 shadow-xs bg-indigo-100 shadow-indigo-100">
       <img
@@ -10,7 +13,7 @@ export default function ProductCard({ _id, title, image, price }: IProduct) {
       />
 
       <div className="mt-2">
-        <dl>
+        <dl className="flex justify-between items-center mb-4">
           <div>
             <dt className="sr-only">Product Name</dt>
 
@@ -20,11 +23,11 @@ export default function ProductCard({ _id, title, image, price }: IProduct) {
             <dt className="sr-only">Price</dt>
 
             <dd className="text-sm text-gray-500">${price}</dd>
-          </div>
-
-          <a
+          </div>   
+     </dl>
+        <button
+            onClick={() => addItemToCart(_id)}
             className="group flex items-center justify-between gap-4 rounded-lg border border-indigo-600 bg-indigo-600 px-5 py-3 transition-colors hover:bg-transparent focus:ring-3 focus:outline-hidden"
-            href="#"
           >
             <span className="font-medium text-white transition-colors group-hover:text-indigo-600">
               Add to cart
@@ -46,8 +49,7 @@ export default function ProductCard({ _id, title, image, price }: IProduct) {
                 />
               </svg>
             </span>
-          </a>
-        </dl>
+          </button>
       </div>
     </div>
   );
