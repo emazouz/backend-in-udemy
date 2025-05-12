@@ -4,12 +4,13 @@ export interface ICreateCardForUser {
 
 export interface IGetActiveCardForUser {
   userId: string;
+  populateProduct?: boolean;
 }
 
 export interface IAddItemToCard {
   userId: string;
   productId: any;
-  quantity: string;
+  quantity: number;
 }
 
 export interface IUpdateItemToCard {

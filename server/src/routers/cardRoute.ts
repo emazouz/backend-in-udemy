@@ -7,18 +7,18 @@ import {
   clearCard,
   checkOut,
 } from "../services/cardService";
-import validatJWT from "../middleware/validatJWT";
+import validateJWT from "../middleware/validateJWT";
 import { ExtendRequest } from "../interfaces/extendRequest";
 
 const router = express.Router();
 
-router.get("/", validatJWT, async (req: ExtendRequest, res) => {
+router.get("/", validateJWT, async (req: ExtendRequest, res) => {
   const userId = req.user._id;
-  const card = await getActiveCardForUser({ userId });
+  const card = await getActiveCardForUser({ userId, populateProduct: true });
   res.status(200).send(card);
 });
 
-router.post("/items", validatJWT, async (req: ExtendRequest, res) => {
+router.post("/items", validateJWT, async (req: ExtendRequest, res) => {
   const userId = req.user._id;
   const { productId, quantity } = req.body;
   const response = await addItemToCard({
@@ -26,10 +26,10 @@ router.post("/items", validatJWT, async (req: ExtendRequest, res) => {
     productId,
     quantity,
   });
-  res.status(response.statusCode).send(response.data);
+  res.status(response.statusCode).json(response.data);
 });
 
-router.put("/items", validatJWT, async (req: ExtendRequest, res) => {
+router.put("/items", validateJWT, async (req: ExtendRequest, res) => {
   const userId = req.user?._id;
   const { productId, quantity } = req.body;
   const response = await updateItemToCard({
@@ -44,7 +44,7 @@ router.put("/items", validatJWT, async (req: ExtendRequest, res) => {
 
 router.delete(
   "/items/:productId",
-  validatJWT,
+  validateJWT,
   async (req: ExtendRequest, res) => {
     const userId = req?.user?._id;
     const { productId } = req.params;
@@ -55,13 +55,13 @@ router.delete(
 
 // ! clear cart
 
-router.delete("/", validatJWT, async (req: ExtendRequest, res) => {
+router.delete("/", validateJWT, async (req: ExtendRequest, res) => {
   const userId = req.user._id;
   const response = await clearCard({ userId });
   res.status(response.statusCode).send(response.data);
 });
 
-router.post("/checkout", validatJWT, async (req: ExtendRequest, res) => {
+router.post("/checkout", validateJWT, async (req: ExtendRequest, res) => {
   const userId = req.user._id;
   const { address } = req.body;
   const response = await checkOut({ userId, address });

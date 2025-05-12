@@ -23,18 +23,26 @@ const createCardForUser = async ({ userId }: ICreateCardForUser) => {
 
 export const getActiveCardForUser = async ({
   userId,
+  populateProduct,
 }: IGetActiveCardForUser) => {
   try {
-    let card = await cardModel.findOne({ userId });
+    // Fetch the active card for the user
+    let card = populateProduct
+      ? await cardModel
+          .findOne({ userId, status: "Active" })
+          .populate("itemsCard.product")
+      : await cardModel.findOne({ userId, status: "Active" });
 
+    console.log(card);
     if (!card) {
+      // If no active card exists, create a new one
       card = await createCardForUser({ userId });
     }
 
     return card;
   } catch (err) {
     console.error("Error fetching card:", err); // Log the error for debugging
-    return null; // Use null instead of an empty string for clarity
+    throw new Error("Failed to fetch active card"); // Explicit error for upstream handling
   }
 };
 
@@ -42,17 +50,18 @@ export const addItemToCard = async ({
   userId,
   productId,
   quantity,
-}: IAddItemToCard) => {
+}: IAddItemToCard): Promise<{ data: any; statusCode: number }> => {
   try {
-    // Fetch the active cart for the user
-    const card = await getActiveCardForUser({ userId });
+    // Fetch the active card for the user
+    const card = await getActiveCardForUser({ userId, populateProduct: false });
 
     if (!card) {
       return { data: "Active cart not found for the user", statusCode: 404 };
     }
+
     // Check if the product already exists in the cart
     const existsInCard = card.itemsCard.find(
-      (e) => e.product.toString() === productId
+      (item) => item.product.toString() === productId
     );
 
     if (existsInCard) {
@@ -70,7 +79,7 @@ export const addItemToCard = async ({
     }
 
     // Check if the requested quantity exceeds the stock
-    if (parseInt(quantity) > product.stock) {
+    if (quantity > product.stock) {
       return {
         data: "Insufficient stock for the requested quantity",
         statusCode: 400,
@@ -78,21 +87,31 @@ export const addItemToCard = async ({
     }
 
     // Add the price of the product to the total amount in the cart
-    card.totalAmount += product.price * parseInt(quantity);
+    card.totalAmount = parseFloat(
+      (card.totalAmount + product.price * quantity).toFixed(2)
+    );
 
     // Add the item to the cart
     card.itemsCard.push({
       product: productId,
-      unitPrice: product.price,
-      quantity: parseInt(quantity),
+      unitPrice: parseFloat(product.price.toFixed(2)), // Ensure price is properly formatted
+      quantity,
     });
 
     // Save the updated cart
-    const updatedCard = await card.save();
+    await card.save();
 
-    return { data: updatedCard, statusCode: 201 };
+    // Fetch and return the updated cart with products populated
+    const updatedCard = await getActiveCardForUser({
+      userId,
+      populateProduct: true,
+    });
+
+    return {
+      data: updatedCard,
+      statusCode: 200,
+    };
   } catch (error) {
-    // Handle unexpected errors
     console.error("Error adding item to cart:", error);
     return { data: "An unexpected error occurred", statusCode: 500 };
   }
@@ -149,9 +168,18 @@ export const updateItemToCard = async ({
     total += existsInCard.quantity * existsInCard.unitPrice;
     card.totalAmount = total;
     // Save the updated cart
-    const updatedCard = await card.save();
+    await card.save();
 
-    return { data: updatedCard, statusCode: 201 };
+    // Fetch and return the updated cart with products populated
+    const updatedCard = await getActiveCardForUser({
+      userId,
+      populateProduct: true,
+    });
+
+    return {
+      data: updatedCard,
+      statusCode: 200,
+    };
   } catch (error) {
     // Handle unexpected errors
     console.error("Error adding item to cart:", error);
@@ -164,7 +192,7 @@ export const deleteItemToCard = async ({
   productId,
 }: IDeleteItemToCard) => {
   try {
-    const card = await getActiveCardForUser({ userId });
+    const card = await getActiveCardForUser({ userId, populateProduct: true });
     if (!card) {
       return { data: "Active cart not found for the user", statusCode: 404 };
     }
@@ -180,7 +208,6 @@ export const deleteItemToCard = async ({
         statusCode: 400,
       };
     }
-  
 
     const anotherItem = card.itemsCard.filter(
       (e) => e.product.toString() !== productId
@@ -192,9 +219,18 @@ export const deleteItemToCard = async ({
     card.itemsCard = anotherItem;
     card.totalAmount = total;
     // Save the updated cart
-    const updatedCard = await card.save();
+    await card.save();
 
-    return { data: updatedCard, statusCode: 201 };
+    // Fetch and return the updated cart with products populated
+    const updatedCard = await getActiveCardForUser({
+      userId,
+      populateProduct: true,
+    });
+
+    return {
+      data: updatedCard,
+      statusCode: 200,
+    };
   } catch (err) {
     console.error("Error deleting item ", err);
     return { data: "Error deleting", statusCode: 400 };
@@ -203,7 +239,7 @@ export const deleteItemToCard = async ({
 
 export const clearCard = async ({ userId }: IClearCard) => {
   try {
-    const card = await getActiveCardForUser({ userId });
+    const card = await getActiveCardForUser({ userId, populateProduct: true });
 
     if (!card) {
       return { data: "Card not found", statusCode: 404 }; // Handle case where card doesn't exist
@@ -222,7 +258,7 @@ export const clearCard = async ({ userId }: IClearCard) => {
 
 export const checkOut = async ({ userId, address }: ICheckOut) => {
   try {
-    const card = await getActiveCardForUser({ userId });
+    const card = await getActiveCardForUser({ userId, populateProduct: false });
     if (!card) {
       return { data: "Active cart not found for the user", statusCode: 404 };
     }

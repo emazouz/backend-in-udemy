@@ -23,9 +23,9 @@ interface ICard extends Document {
 }
 const cardSchema = new Schema<ICard>({
   userId: { type: Schema.Types.ObjectId, required: true },
-  itemsCard: [],
+  itemsCard: [itemsSchema],
   totalAmount: { type: Number, required: true },
-  status: { type: String, enum: statusSchema },
+  status: { type: String, enum: statusSchema, default: "Active" },
 });
 
 const cardModel = mongoose.model<ICard>("Card", cardSchema);

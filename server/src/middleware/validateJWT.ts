@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import userModel from "../models/userSchema";
 import { ExtendRequest } from "../interfaces/extendRequest";
 
-const validatJWT = (req: ExtendRequest, res: Response, next: NextFunction) => {
+const validateJWT = (req: ExtendRequest, res: Response, next: NextFunction) => {
   const authorizationHeader = req.get("authorization");
   // check in authorization ?
   if (!authorizationHeader) {
@@ -37,4 +37,4 @@ const validatJWT = (req: ExtendRequest, res: Response, next: NextFunction) => {
   });
 };
 
-export default validatJWT;
+export default validateJWT;
