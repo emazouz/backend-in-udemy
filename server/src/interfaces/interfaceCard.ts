@@ -16,7 +16,7 @@ export interface IAddItemToCard {
 export interface IUpdateItemToCard {
   userId: string;
   productId: any;
-  quantity: string;
+  quantity: number;
 }
 
 export interface IDeleteItemToCard {

@@ -1,8 +1,12 @@
 import { useAuthContext } from "context/auth/AuthContext";
 import { Link, useNavigate } from "react-router";
+import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
+import Badge from "@mui/material/Badge";
+import { useCart } from "context/cart/CartContext";
+
 export default function Navbar() {
   const { username, isLogin, logout } = useAuthContext();
-
+  const { cartItems } = useCart();
   const navigate = useNavigate();
   const handleLogout = () => {
     logout();
@@ -13,7 +17,7 @@ export default function Navbar() {
     <header className="bg-white dark:bg-gray-900">
       <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          <a className="block text-teal-600 dark:text-teal-300" href="#">
+          <a className="block text-teal-600 dark:text-teal-300" href="/">
             <svg
               className="h-8"
               viewBox="0 0 28 24"
@@ -90,7 +94,9 @@ export default function Navbar() {
               to={"/cart"}
               className="font-bold text-white cursor-pointer duration-200 hover:text-[#00f]"
             >
-              Cart
+              <Badge color="secondary" badgeContent={cartItems.length} showZero>
+                <ShoppingBasketIcon sx={{ color: "#ffff" }} />
+              </Badge>
             </Link>
 
             {isLogin ? (

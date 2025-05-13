@@ -7,7 +7,7 @@ import {
   IGetActiveCardForUser,
   IUpdateItemToCard,
 } from "../interfaces/interfaceCard";
-import cardModel from "../models/cardModel";
+import cardModel, { CartStatus } from "../models/cardModel";
 import orderModel, { IOrderItem } from "../models/orderModel";
 import productModel from "../models/productModel";
 
@@ -29,11 +29,10 @@ export const getActiveCardForUser = async ({
     // Fetch the active card for the user
     let card = populateProduct
       ? await cardModel
-          .findOne({ userId, status: "Active" })
+          .findOne({ userId, status: CartStatus.Active })
           .populate("itemsCard.product")
-      : await cardModel.findOne({ userId, status: "Active" });
+      : await cardModel.findOne({ userId, status: CartStatus.Active });
 
-    console.log(card);
     if (!card) {
       // If no active card exists, create a new one
       card = await createCardForUser({ userId });
@@ -94,7 +93,7 @@ export const addItemToCard = async ({
     // Add the item to the cart
     card.itemsCard.push({
       product: productId,
-      unitPrice: parseFloat(product.price.toFixed(2)), // Ensure price is properly formatted
+      unitPrice: parseFloat((product.price * quantity).toFixed(2)), // Ensure price is properly formatted
       quantity,
     });
 
@@ -117,27 +116,27 @@ export const addItemToCard = async ({
   }
 };
 
-export const updateItemToCard = async ({
+export const updateItemToCart = async ({
   userId,
   productId,
   quantity,
 }: IUpdateItemToCard) => {
   try {
     // Fetch the active cart for the user
-    const card = await getActiveCardForUser({ userId });
+    const cart = await getActiveCardForUser({ userId });
 
-    if (!card) {
+    if (!cart) {
       return { data: "Active cart not found for the user", statusCode: 404 };
     }
 
     // Check if the product already exists in the cart
-    const existsInCard = card.itemsCard.find(
-      (e) => e.product.toString() === productId
+    const existsInCart = cart.itemsCard.find(
+      (item) => item.product.toString() === productId
     );
 
-    if (!existsInCard) {
+    if (!existsInCart) {
       return {
-        data: "This product is not exists in the cart",
+        data: "This product does not exist in the cart",
         statusCode: 400,
       };
     }
@@ -150,39 +149,40 @@ export const updateItemToCard = async ({
     }
 
     // Check if the requested quantity exceeds the stock
-    if (parseInt(quantity) > product.stock) {
+    if (quantity > product.stock) {
       return {
         data: "Insufficient stock for the requested quantity",
         statusCode: 400,
       };
     }
 
-    existsInCard.quantity = parseInt(quantity);
-    // Add the price of the product to the total amount in the cart
-    let total = card.itemsCard
-      .filter((e) => e.product !== productId)
-      .reduce((sum, acc) => {
-        sum += acc.unitPrice * acc.quantity;
-        return sum;
-      }, 0);
-    total += existsInCard.quantity * existsInCard.unitPrice;
-    card.totalAmount = total;
+    // Update the unit price based on the product price
+    existsInCart.quantity = quantity; // Update the quantity of the item in the cart
+    existsInCart.unitPrice = quantity * product.price; // Update the quantity of the item in the cart
+
+    // Calculate the total amount in the cart
+    const total = cart.itemsCard.reduce((sum, item) => {
+      return sum + item.unitPrice;
+    }, 0);
+
+    cart.totalAmount = total;
+
     // Save the updated cart
-    await card.save();
+    await cart.save();
 
     // Fetch and return the updated cart with products populated
-    const updatedCard = await getActiveCardForUser({
+    const updatedCart = await getActiveCardForUser({
       userId,
       populateProduct: true,
     });
 
     return {
-      data: updatedCard,
+      data: updatedCart,
       statusCode: 200,
     };
   } catch (error) {
     // Handle unexpected errors
-    console.error("Error adding item to cart:", error);
+    console.error("Error updating item in cart:", error);
     return { data: "An unexpected error occurred", statusCode: 500 };
   }
 };
@@ -199,9 +199,8 @@ export const deleteItemToCard = async ({
 
     // Check if the product already exists in the cart
     const existsInCard = card.itemsCard.find(
-      (e) => e.product.toString() === productId
+      (item) => String(item.product._id) === productId
     );
-
     if (!existsInCard) {
       return {
         data: "This product is not exists in the cart",
@@ -210,10 +209,11 @@ export const deleteItemToCard = async ({
     }
 
     const anotherItem = card.itemsCard.filter(
-      (e) => e.product.toString() !== productId
+      (e) => String(e.product._id) !== productId
     );
+
     const total = anotherItem.reduce((sum, acc) => {
-      sum += acc.unitPrice * acc.quantity;
+      sum += acc.unitPrice;
       return sum;
     }, 0);
     card.itemsCard = anotherItem;
@@ -237,7 +237,7 @@ export const deleteItemToCard = async ({
   }
 };
 
-export const clearCard = async ({ userId }: IClearCard) => {
+export const cleanCard = async ({ userId }: IClearCard) => {
   try {
     const card = await getActiveCardForUser({ userId, populateProduct: true });
 
@@ -286,7 +286,7 @@ export const checkOut = async ({ userId, address }: ICheckOut) => {
     });
 
     await order.save();
-    card.status = "Completed";
+    card.status = CartStatus.Completed;
     await card.save();
     return { data: order, statusCode: 200 };
   } catch (err) {

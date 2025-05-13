@@ -2,9 +2,9 @@ import express, { Request } from "express";
 import {
   addItemToCard,
   getActiveCardForUser,
-  updateItemToCard,
+  updateItemToCart,
   deleteItemToCard,
-  clearCard,
+  cleanCard,
   checkOut,
 } from "../services/cardService";
 import validateJWT from "../middleware/validateJWT";
@@ -32,7 +32,7 @@ router.post("/items", validateJWT, async (req: ExtendRequest, res) => {
 router.put("/items", validateJWT, async (req: ExtendRequest, res) => {
   const userId = req.user?._id;
   const { productId, quantity } = req.body;
-  const response = await updateItemToCard({
+  const response = await updateItemToCart({
     userId,
     productId,
     quantity,
@@ -46,7 +46,7 @@ router.delete(
   "/items/:productId",
   validateJWT,
   async (req: ExtendRequest, res) => {
-    const userId = req?.user?._id;
+    const userId = req.user._id;
     const { productId } = req.params;
     const response = await deleteItemToCard({ userId, productId });
     res.status(response.statusCode).send(response.data);
@@ -57,7 +57,7 @@ router.delete(
 
 router.delete("/", validateJWT, async (req: ExtendRequest, res) => {
   const userId = req.user._id;
-  const response = await clearCard({ userId });
+  const response = await cleanCard({ userId });
   res.status(response.statusCode).send(response.data);
 });
 
