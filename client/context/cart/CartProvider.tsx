@@ -207,6 +207,7 @@ export const CartProvider: FC<PropsWithChildren> = ({ children }) => {
     setCartItems([...itemsCardMapped]);
     setTotalAmount(data.totalAmount);
   };
+  
 
   return (
     <CartContext.Provider

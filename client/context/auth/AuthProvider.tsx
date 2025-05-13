@@ -1,10 +1,11 @@
 import { useEffect, useState, type FC, type PropsWithChildren } from "react";
 import { AuthContext } from "./AuthContext";
+import { BASE_URL } from "constant/BasicUrl";
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const [username, setUsername] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
-
+  const [orders, setOrders] = useState<[]>([]);
   useEffect(() => {
     if (typeof window !== "undefined") {
       setUsername(window.localStorage.getItem("username"));
@@ -27,8 +28,23 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     setUsername(null);
     setToken(null);
   };
+
+  const getMyOrders = async () => {
+    const response = await fetch(`${BASE_URL}/user/my-orders`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) return;
+    const data = await response.json();
+    setOrders(data.data);
+  };
+ 
   return (
-    <AuthContext.Provider value={{ username, token, login, isLogin, logout }}>
+    <AuthContext.Provider
+      value={{ username, token, login, isLogin, logout, getMyOrders, orders }}
+    >
       {children}
     </AuthContext.Provider>
   );

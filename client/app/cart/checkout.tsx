@@ -1,11 +1,15 @@
+import { BASE_URL } from "constant/BasicUrl";
+import { useAuthContext } from "context/auth/AuthContext";
 import { useCart } from "context/cart/CartContext";
 import React, { useState } from "react";
+import { useNavigate } from "react-router";
 export default function Checkout() {
   const { cartItems, totalAmount } = useCart();
+  const { token } = useAuthContext();
   const [formData, setFormData] = useState({
     address: "",
   });
-
+  const navigate = useNavigate();
   const handleInputChange = (e: any) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -13,11 +17,31 @@ export default function Checkout() {
       [name]: value,
     }));
   };
-
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    // Handle checkout logic here
-    console.log("Order submitted:", { formData, cartItems, totalAmount });
+  const handleSubmit = async () => {
+    try {
+            const response = await fetch(`${BASE_URL}/card/checkout`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json", // Use lowercase 'application/json'
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                address: formData.address,
+              }),
+            });
+        
+            if (!response.ok) {
+              // Handle the response error more gracefully
+              const errorData = await response.json(); // Optionally get the error details from the response
+              throw new Error(errorData.message || "Failed to add product to cart");
+            }
+        
+            navigate("/order-success");
+            // Navigate on successful response
+          } catch (error) {
+            console.error("Error during checkout:", error); // Log the error for debugging
+            // Optionally, you can show an error message to the user
+          }
   };
 
   return (
@@ -29,7 +53,9 @@ export default function Checkout() {
           {/* Shipping Information Form */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold mb-6">Shipping Information</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <div
+              className="space-y-4"
+            >
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Shipping Address
@@ -46,12 +72,12 @@ export default function Checkout() {
               </div>
 
               <button
-                type="submit"
+                onClick={handleSubmit}
                 className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition-colors"
               >
                 Place Order
               </button>
-            </form>
+            </div>
           </div>
 
           {/* Order Summary */}
@@ -87,7 +113,9 @@ export default function Checkout() {
               <div className="mt-6 pt-6 border-t">
                 <div className="flex justify-between items-center font-semibold text-lg">
                   <span>Total Amount</span>
-                  <span className="text-red-600">${totalAmount.toFixed(2)}</span>
+                  <span className="text-red-600">
+                    ${totalAmount.toFixed(2)}
+                  </span>
                 </div>
               </div>
             </div>

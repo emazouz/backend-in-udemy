@@ -1,5 +1,5 @@
 import { useAuthContext } from "context/auth/AuthContext";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router"; // Use 'react-router-dom'
 import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
 import Badge from "@mui/material/Badge";
 import { useCart } from "context/cart/CartContext";
@@ -8,6 +8,7 @@ export default function Navbar() {
   const { username, isLogin, logout } = useAuthContext();
   const { cartItems } = useCart();
   const navigate = useNavigate();
+
   const handleLogout = () => {
     logout();
     navigate("/");
@@ -17,7 +18,7 @@ export default function Navbar() {
     <header className="bg-white dark:bg-gray-900">
       <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          <a className="block text-teal-600 dark:text-teal-300" href="/">
+          <Link to="/" className="block text-teal-600 dark:text-teal-300">
             <svg
               className="h-8"
               viewBox="0 0 28 24"
@@ -29,73 +30,37 @@ export default function Navbar() {
                 fill="currentColor"
               />
             </svg>
-          </a>
+          </Link>
 
           <div className="md:flex md:items-center md:gap-12">
             <nav aria-label="Global" className="hidden md:block">
               <ul className="flex items-center gap-6 text-sm">
-                <li>
-                  <a
-                    className="text-gray-500 transition hover:text-gray-500/75 dark:text-white dark:hover:text-white/75"
-                    href="#"
-                  >
-                    About
-                  </a>
-                </li>
-
-                <li>
-                  <a
-                    className="text-gray-500 transition hover:text-gray-500/75 dark:text-white dark:hover:text-white/75"
-                    href="#"
-                  >
-                    Careers
-                  </a>
-                </li>
-
-                <li>
-                  <a
-                    className="text-gray-500 transition hover:text-gray-500/75 dark:text-white dark:hover:text-white/75"
-                    href="#"
-                  >
-                    History
-                  </a>
-                </li>
-
-                <li>
-                  <a
-                    className="text-gray-500 transition hover:text-gray-500/75 dark:text-white dark:hover:text-white/75"
-                    href="#"
-                  >
-                    Services
-                  </a>
-                </li>
-
-                <li>
-                  <a
-                    className="text-gray-500 transition hover:text-gray-500/75 dark:text-white dark:hover:text-white/75"
-                    href="#"
-                  >
-                    Projects
-                  </a>
-                </li>
-
-                <li>
-                  <a
-                    className="text-gray-500 transition hover:text-gray-500/75 dark:text-white dark:hover:text-white/75"
-                    href="#"
-                  >
-                    Blog
-                  </a>
-                </li>
+                {[
+                  "About",
+                  "Careers",
+                  "History",
+                  "Services",
+                  "Projects",
+                  "Blog",
+                ].map((item) => (
+                  <li key={item}>
+                    <a
+                      className="text-gray-500 transition hover:text-gray-500/75 dark:text-white dark:hover:text-white/75"
+                      href="#"
+                    >
+                      {item}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </nav>
 
             <Link
-              to={"/cart"}
+              to="/cart"
               className="font-bold text-white cursor-pointer duration-200 hover:text-[#00f]"
             >
               <Badge color="secondary" badgeContent={cartItems.length} showZero>
-                <ShoppingBasketIcon sx={{ color: "#ffff" }} />
+                <ShoppingBasketIcon sx={{ color: "#fff" }} />
               </Badge>
             </Link>
 
@@ -108,24 +73,24 @@ export default function Navbar() {
                 </div>
 
                 <div
-                  className="absolute end-0 z-10 mt-0.5 w-56 rounded-md border border-gray-100 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900"
+                  className="absolute right-0 z-10 mt-0.5 w-56 rounded-md border border-gray-100 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900"
                   role="menu"
                 >
                   <div className="hidden group-hover:block p-2">
-                    <a
-                      href="#"
+                    <Link
+                      to="/profile"
                       className="block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300"
                       role="menuitem"
                     >
-                      My profile
-                    </a>
-                    <a
-                      href="#"
+                      My Profile
+                    </Link>
+                    <Link
+                      to="/my-orders"
                       className="block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300"
                       role="menuitem"
                     >
                       My Orders
-                    </a>
+                    </Link>
 
                     <button
                       onClick={handleLogout}

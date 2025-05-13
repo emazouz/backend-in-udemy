@@ -2,6 +2,7 @@ import userModel from "../models/userSchema";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { ILoginParams, IRegisterParams } from "../interfaces/userInterface";
+import orderModel from "../models/orderModel";
 
 export const register = async ({
   firstName,
@@ -23,7 +24,7 @@ export const register = async ({
   });
   await newUser.save();
 
-  return { data: generatJwt({ firstName, lastName, email }), statusCode: 200 };
+  return { data: generateJwt({ firstName, lastName, email }), statusCode: 200 };
 };
 
 export const login = async ({ email, password }: ILoginParams) => {
@@ -39,7 +40,7 @@ export const login = async ({ email, password }: ILoginParams) => {
     }
 
     return {
-      data: generatJwt({
+      data: generateJwt({
         email,
         firstName: findUser.firstName,
         lastName: findUser.lastName,
@@ -52,6 +53,20 @@ export const login = async ({ email, password }: ILoginParams) => {
   }
 };
 
-const generatJwt = (data: any) => {
+interface IMyOrders {
+  userId: string;
+}
+export const getMyOrders = async ({ userId }: IMyOrders) => {
+  try {
+    return {
+      data: await orderModel.find({ userId }),
+      statusCode: 200,
+    };
+  } catch (err) {
+    throw err;
+  }
+};
+
+const generateJwt = (data: any) => {
   return jwt.sign(data, process.env.JWT_SECRET || "");
 };
